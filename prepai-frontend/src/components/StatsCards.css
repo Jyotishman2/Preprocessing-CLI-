@@ -1,0 +1,145 @@
+.stats-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: rgba(11, 15, 30, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  &:hover {
+    border-color: currentColor;
+    box-shadow: 0 0 20px currentColor;
+
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+/* Color variants */
+.stat-cyan {
+  color: #00d4ff;
+  border-color: rgba(0, 212, 255, 0.2);
+
+  &:hover {
+    background: rgba(0, 212, 255, 0.1);
+  }
+}
+
+.stat-violet {
+  color: #a855f7;
+  border-color: rgba(168, 85, 247, 0.2);
+
+  &:hover {
+    background: rgba(168, 85, 247, 0.1);
+  }
+}
+
+.stat-orange {
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.2);
+
+  &:hover {
+    background: rgba(245, 158, 11, 0.1);
+  }
+}
+
+.stat-red {
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.2);
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.1);
+  }
+}
+
+.stat-green {
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.2);
+
+  &:hover {
+    background: rgba(16, 185, 129, 0.1);
+  }
+}
+
+.stat-blue {
+  color: #3b82f6;
+  border-color: rgba(59, 130, 246, 0.2);
+
+  &:hover {
+    background: rgba(59, 130, 246, 0.1);
+  }
+}
+
+.card-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.card-content {
+  flex: 1;
+}
+
+.card-label {
+  font-size: 12px;
+  color: #a0aec0;
+  margin: 0 0 4px 0;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-value {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  color: currentColor;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+@media (max-width: 768px) {
+  .stats-cards-container {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .card-icon {
+    font-size: 24px;
+  }
+
+  .card-value {
+    font-size: 18px;
+  }
+
+  .card-label {
+    font-size: 11px;
+  }
+}
