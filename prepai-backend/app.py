@@ -6,6 +6,7 @@ from pydantic import BaseModel
 import pandas as pd
 import numpy as np
 import json
+import os
 
 from pathlib import Path
 
@@ -24,6 +25,13 @@ from analysis import (
 from preprocessing import PreprocessingPipeline
 from ai_suggestions import AISuggestions
 
+# ==========================================================
+# CREATE REQUIRED FOLDERS
+# ==========================================================
+
+os.makedirs("uploads", exist_ok=True)
+os.makedirs("processed", exist_ok=True)
+os.makedirs("processed/logs", exist_ok=True)
 
 # ==========================================================
 # FASTAPI APP
@@ -46,7 +54,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 # ==========================================================
 # NUMPY SAFE CONVERTER
@@ -77,7 +84,6 @@ def safe_json(data):
         json.dumps(data, default=convert_numpy)
     )
 
-
 # ==========================================================
 # CONFIG MODEL
 # ==========================================================
@@ -85,17 +91,11 @@ def safe_json(data):
 class PreprocessConfig(BaseModel):
 
     fill_strategy: str = "mean"
-
     scaling_method: str = "standard"
-
     outlier_threshold: float = 1.5
-
     variance_threshold: float = 0.01
-
     remove_duplicates: bool = True
-
     encode_categorical: bool = True
-
 
 # ==========================================================
 # HEALTH CHECK
@@ -108,7 +108,6 @@ async def health_check():
         "status": "ok",
         "service": "PrepAI Backend",
     }
-
 
 # ==========================================================
 # FILE UPLOAD
@@ -151,11 +150,12 @@ async def upload_file(
 
     except Exception as e:
 
+        print("UPLOAD ERROR:", str(e))
+
         raise HTTPException(
             status_code=500,
             detail=f"Upload failed: {str(e)}"
         )
-
 
 # ==========================================================
 # DATASET SUMMARY
@@ -176,11 +176,8 @@ async def get_summary(filename: str):
             )
 
         if filename.endswith(".csv"):
-
             df = pd.read_csv(file_path)
-
         else:
-
             df = pd.read_excel(file_path)
 
         analyze_dataset(df)
@@ -194,13 +191,12 @@ async def get_summary(filename: str):
 
     except Exception as e:
 
-        print("SUMMARY ERROR:", e)
+        print("SUMMARY ERROR:", str(e))
 
         raise HTTPException(
             status_code=500,
             detail=f"Analysis failed: {str(e)}"
         )
-
 
 # ==========================================================
 # PREPROCESS DATASET
@@ -224,11 +220,8 @@ async def preprocess_file(
             )
 
         if filename.endswith(".csv"):
-
             df = pd.read_csv(file_path)
-
         else:
-
             df = pd.read_excel(file_path)
 
         pipeline = PreprocessingPipeline(
@@ -324,13 +317,12 @@ async def preprocess_file(
 
     except Exception as e:
 
-        print("PREPROCESS ERROR:", e)
+        print("PREPROCESS ERROR:", str(e))
 
         raise HTTPException(
             status_code=500,
             detail=f"Preprocessing failed: {str(e)}"
         )
-
 
 # ==========================================================
 # DOWNLOAD FILE
@@ -356,7 +348,7 @@ async def download_file(filename: str):
         return FileResponse(
             path=file_path,
             filename=filename,
-            media_type="text/csv",
+            media_type="application/octet-stream",
         )
 
     except HTTPException:
@@ -368,7 +360,6 @@ async def download_file(filename: str):
             status_code=500,
             detail=f"Download failed: {str(e)}"
         )
-
 
 # ==========================================================
 # AI SUGGESTIONS
@@ -389,11 +380,8 @@ async def get_ai_suggestions(filename: str):
             )
 
         if filename.endswith(".csv"):
-
             df = pd.read_csv(file_path)
-
         else:
-
             df = pd.read_excel(file_path)
 
         analysis = analyze_dataset(df)
@@ -425,7 +413,6 @@ async def get_ai_suggestions(filename: str):
             ],
         }
 
-
 # ==========================================================
 # VISUALIZATIONS
 # ==========================================================
@@ -445,11 +432,8 @@ async def get_visualizations(filename: str):
             )
 
         if filename.endswith(".csv"):
-
             df = pd.read_csv(file_path)
-
         else:
-
             df = pd.read_excel(file_path)
 
         visualizations = {
@@ -477,7 +461,6 @@ async def get_visualizations(filename: str):
             status_code=500,
             detail=f"Visualization failed: {str(e)}"
         )
-
 
 # ==========================================================
 # REPORT DOWNLOAD
@@ -525,7 +508,6 @@ async def get_report(filename: str):
             detail=f"Report failed: {str(e)}"
         )
 
-
 # ==========================================================
 # DATA PREVIEW
 # ==========================================================
@@ -548,11 +530,8 @@ async def preview_data(filename: str):
             )
 
         if filename.endswith(".csv"):
-
             df = pd.read_csv(file_path)
-
         else:
-
             df = pd.read_excel(file_path)
 
         preview_df = df.head(50)
@@ -586,7 +565,6 @@ async def preview_data(filename: str):
             detail=f"Preview failed: {str(e)}"
         )
 
-
 # ==========================================================
 # MAIN
 # ==========================================================
@@ -596,7 +574,7 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(
-        "main:app",
+        "app:app",
         host="0.0.0.0",
         port=8000,
         reload=True

@@ -1,18 +1,18 @@
 import axios from 'axios';
 
-const API_BASE = 'http://127.0.0.1:8000/api';
+// ======================================================
+// API BASE
+// ======================================================
+
+const API_BASE =
+  'https://preprocessing-cli.onrender.com/api';
 
 // ======================================================
 // AXIOS CLIENT
 // ======================================================
 
 const apiClient = axios.create({
-
   baseURL: API_BASE,
-
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // ======================================================
@@ -26,34 +26,24 @@ export const uploadFile = async (
 
   const formData = new FormData();
 
-  formData.append(
-    'file',
-    file
-  );
+  formData.append('file', file);
 
   return apiClient.post(
     '/upload',
     formData,
     {
 
-      headers: {
-        'Content-Type':
-          'multipart/form-data',
-      },
-
-      onUploadProgress:
-        (progressEvent) => {
+      onUploadProgress: (
+        progressEvent
+      ) => {
 
         const percentCompleted =
           Math.round(
-
             (progressEvent.loaded * 100) /
-
             progressEvent.total
           );
 
         if (onProgress) {
-
           onProgress(
             percentCompleted
           );
@@ -80,10 +70,11 @@ export const getSummary = async (
 // RUN PREPROCESSING
 // ======================================================
 
-export const preprocessData = async (
-  filename,
-  config
-) => {
+export const preprocessData =
+  async (
+    filename,
+    config
+  ) => {
 
   return apiClient.post(
     `/preprocess/${filename}`,
